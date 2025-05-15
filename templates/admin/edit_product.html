@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Edit Product</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_layout.css') }}">
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Moonwalker Cake Shop</h1>
+        </div>
+    </header>
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/admin_dashboard" class="nav-link">Home</a>
+            <a href="/admin_products" class="nav-link">Products</a>
+            <a href="/admin_categories" class="nav-link">Categories</a>
+            <a href="/admin_orders" class="nav-link">Orders</a>
+            <a href="/admin_statistics" class="nav-link">Statistics</a>
+            <a href="/admin_promotions" class="nav-link">Promotions</a>
+            <a href="/admin_membership" class="nav-link">Memberships</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+        <main>
+            <h2 class="modify-product-title">Editing a Product</h2>
+            <form method="POST" enctype="multipart/form-data" class="modify-product-form">
+                <div class="modify-product-form-group">
+                    <label for="product-name" class="modify-product-label">Product Name:</label>
+                    <input type="text" name="product_name" class="modify-product-input" value="{{ product.product_name }}" required>
+                </div>
+                <div class="modify-product-form-group">
+                    <label for="product-price" class="modify-product-label">Price:</label>
+                    <input type="number" name="price" class="modify-product-input" value="{{ product.price }}" step="0.01" required>
+                </div>
+                <div class="modify-product-form-group">
+                    <label for="product-category" class="modify-product-label">Category:</label>
+                    <select name="category_id" class="modify-product-select" required>
+                        {% for category in categories %}
+                            <option value="{{ category.category_id }}" 
+                                    {% if category.category_id == product.category_id %}selected{% endif %}>
+                                {{ category.category_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modify-product-form-group">
+                    <label for="image_file" class="modify-product-label">Current Image:</label>
+                    <img src="{{ url_for('static', filename=product.image_url) }}" width="100">
+                </div>
+                <div class="modify-product-form-group">
+                    <label for="image_file" class="modify-product-label">Upload New Image (optional):</label>
+                    <input type="file" name="image_file" class="modify-product-file">
+                </div>
+                <button type="submit" class="modify-product-submit">Update Product</button>
+            </form>
+        </main>
+        <footer>
+            <div class="footer-main">
+                <div class="container">
+                    <div class="footer-grid">
+                        
+                        <div class="footer-section">
+                            <div class="footer-info">
+                                <a href="/" class="footer-logo">
+                                    <h2>Moonwalker Cake Shop</h2>
+                                </a>
+                                <div class="footer-title">
+                                    Sweet Delights & Memorable Moments
+                                </div>
+                                <div class="footer-company">
+                                    <div class="footer-item">
+                                        <span>Phone:</span>
+                                        <a href="tel:0123456789">0123-456-789</a>
+                                    </div>
+                                    <div class="footer-item">
+                                        <span>Email:</span>
+                                        <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                    </div>
+                                    <div class="footer-item">
+                                        <span>Address:</span>
+                                        <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        
+                        <div class="footer-section">
+                            <div class="footer-title">Opening Hours</div>
+                            <div class="footer-hours">
+                                <div class="footer-item">
+                                    <span>Monday - Friday:</span>
+                                    <a>8:00 AM - 9:00 PM</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Saturday - Sunday:</span>
+                                    <a>7:00 AM - 10:00 PM</a>
+                                </div>
+                            </div>
+                        </div>
+        
+                        
+                        <div class="footer-section">
+                            <div class="footer-title">Follow Us</div>
+                            <div class="social-links">
+                                <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                                <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+</body>
+</html>

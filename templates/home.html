@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS: Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Moonwalker Cake Shop</h1>
+            
+        </div>
+        <div class="auth-buttons">
+            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('login') }}">Login</a>
+        </div>
+    </header>
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/products" class="nav-link">Products</a>
+            <a href="/reviews" class="nav-link">Reviews</a>
+            <a href="/about_us" class="nav-link">About Us</a>
+        </div>
+    </nav>        
+    <div class="carousel">
+        <div class="carousel-slides">
+            <div class="carousel-slide">
+                <img src="{{ url_for('static', filename='images/carousel-1.jpg') }}"  alt="Bakery Image 1">
+                <div class="carousel-content">
+                    <h1>Use code FLASHSALES for 10% OFF on all deals!</h1>
+                    <a href="" class="btn">Read More</a>
+                </div>
+            </div>
+            <div class="carousel-slide">
+                <img src="{{ url_for('static', filename='images/carousel-2.jpg') }}"  alt="Bakery Image 2">
+                <div class="carousel-content">
+                    <h1>Use code NEWPROMO to get 5% OFF your first order!</h1>
+                    <a href="" class="btn">Read More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Products</h2>
+            </div>
+            <div class="product-list">
+                {% if random_products %}
+                    {% for product in random_products %}
+                    <div class="product">
+                        <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.product_name }}">
+                        <div class="product-info">
+                            <h2 class="product-name">{{ product.product_name }}</h2>
+                            <p class="product-price">{{ "{:,.0f}".format(product.price) }} VND</p>
+                            <p class="product-description">{{ product.description }}</p>
+                            <form action="{{ url_for('add_to_cart') }}" method="POST">
+                                <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                                <button type="submit" class="add-to-cart">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="text-align: center; color: #5a3e36;">No products available at the moment.</p>
+                {% endif %}
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/products" class="review-button">See All Products</a>
+            </div>
+        </div>
+        <div class="testimonial-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Latest Customer Reviews</h2>
+                </div>
+                <div class="testimonial-container">
+                    {% if reviews %}
+                        <div class="testimonial-wrapper">
+                            {% for review in reviews %}
+                            <div class="testimonial-item">
+                                <div class="testimonial-content">
+                                    <div class="testimonial-header">
+                                        {% if review.product_image_url %}
+                                        <img src="{{ url_for('static', filename=review.product_image_url) }}" 
+                                             alt="{{ review.product_name }}" 
+                                             class="testimonial-img">
+                                        {% else %}
+                                        <div class="testimonial-img">
+                                            <i class="fas fa-cookie"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="testimonial-info">
+                                            <h5>{{ review.product_name }}</h5>
+                                            <div class="rating">
+                                                {% for i in range(5) %}
+                                                    {% if i < review.rating %}
+                                                        <i class="fas fa-star"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <span>{{ review.customer_name }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="testimonial-text">{{ review.comment }}</p>
+                                    <div class="review-date">
+                                        {{ review.created_at.strftime('%B %d, %Y') }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="text-align: center; color: #5a3e36;">No reviews available yet.</p>
+                    {% endif %}
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="/reviews" class="review-button">See All Reviews</a>
+                </div>
+            </div>
+        </div>
+<footer>
+    <div class="footer-main">
+        <div class="container">
+            <div class="footer-grid">
+                
+                <div class="footer-section">
+                    <div class="footer-info">
+                        <a href="/" class="footer-logo">
+                            <h2>Moonwalker Cake Shop</h2>
+                        </a>
+                        <div class="footer-title">
+                            Sweet Delights & Memorable Moments
+                        </div>
+                        <div class="footer-company">
+                            <div class="footer-item">
+                                <span>Phone:</span>
+                                <a href="tel:0123456789">0123-456-789</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Email:</span>
+                                <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Address:</span>
+                                <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="footer-section">
+                    <div class="footer-title">Opening Hours</div>
+                    <div class="footer-hours">
+                        <div class="footer-item">
+                            <span>Monday - Friday:</span>
+                            <a>8:00 AM - 9:00 PM</a>
+                        </div>
+                        <div class="footer-item">
+                            <span>Saturday - Sunday:</span>
+                            <a>7:00 AM - 10:00 PM</a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="footer-section">
+                    <div class="footer-title">Follow Us</div>
+                    <div class="social-links">
+                        <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

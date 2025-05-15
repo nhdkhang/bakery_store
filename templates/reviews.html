@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Moonwalker Cake Shop</h1>
+        </div>
+        <div class="auth-buttons">
+            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('register') }}">Login</a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/products" class="nav-link">Products</a>
+            <a href="/reviews" class="nav-link">Reviews</a>
+            <a href="/about_us" class="nav-link">About Us</a>
+
+        </div>
+    </nav>        
+
+    <div class="carousel">
+        <div class="carousel-slides">
+            <div class="carousel-slide">
+                <img src="static/images/carousel-1.jpg" alt="Bakery Image 1">
+                <div class="carousel-content">
+                    <h1>Use code FLASHSALES for 10% OFF on all deals!</h1>
+                    <a href="" class="btn">Read More</a>
+                </div>
+            </div>
+            <div class="carousel-slide">
+                <img src="static/images/carousel-2.jpg" alt="Bakery Image 2">
+                <div class="carousel-content">
+                    <h1>Use code NEWPROMO to get 5% OFF your first order!</h1>
+                    <a href="" class="btn">Read More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="guest-review-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Customer Reviews</h2>
+        </div>
+        <div class="guest-review-container">
+            {% if reviews %}
+                {% for review in reviews %}
+                <div class="guest-review-item">
+                    <div class="guest-review-content">
+                        <div class="guest-review-header">
+                            <div class="guest-review-info">
+                                <h5>{{ review.product_name }}</h5>
+                                <div class="rating">
+                                    {% for i in range(5) %}
+                                        {% if i < review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span>{{ review.customer_name }}</span>
+                            </div>
+                        </div>
+                        <p class="guest-review-text">{{ review.comment }}</p>
+                        <div class="review-date">
+                            {{ review.created_at.strftime('%B %d, %Y') }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: #5a3e36;">No reviews available yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<footer>
+    <div class="footer-main">
+        <div class="container">
+            <div class="footer-grid">
+                
+                <div class="footer-section">
+                    <div class="footer-info">
+                        <a href="/" class="footer-logo">
+                            <h2>Moonwalker Cake Shop</h2>
+                        </a>
+                        <div class="footer-title">
+                            Sweet Delights & Memorable Moments
+                        </div>
+                        <div class="footer-company">
+                            <div class="footer-item">
+                                <span>Phone:</span>
+                                <a href="tel:0123456789">0123-456-789</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Email:</span>
+                                <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Address:</span>
+                                <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="footer-section">
+                    <div class="footer-title">Opening Hours</div>
+                    <div class="footer-hours">
+                        <div class="footer-item">
+                            <span>Monday - Friday:</span>
+                            <a>8:00 AM - 9:00 PM</a>
+                        </div>
+                        <div class="footer-item">
+                            <span>Saturday - Sunday:</span>
+                            <a>7:00 AM - 10:00 PM</a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="footer-section">
+                    <div class="footer-title">Follow Us</div>
+                    <div class="social-links">
+                        <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

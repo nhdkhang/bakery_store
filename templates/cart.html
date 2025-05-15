@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS: Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Moonwalker Cake Shop</h1>         
+        </div>
+    </header>
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/customer_dashboard" class="nav-link">Home</a>
+            <a href="/customer_profile" class="nav-link">Profile</a>
+            <a href="/cart" class="nav-link">Cart</a>
+            <a href="/order_history/{{ session.customer_id }}" class="nav-link">Order History</a>
+            <a href="/wishlist" class="nav-link">Wishlist</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1 class="cart">Cart</h1>
+        <div class="cart-items">
+            {% if cart_items %}
+                {% for item in cart_items %}
+                    <div class="cart-item" data-cart-item-id="{{ item.cart_item_id }}">
+                        <img src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.product_name }}">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">{{ item.product_name }}</div>
+                            <div class="cart-item-price">{{ item.price }} VND</div>
+                            <div class="cart-item-quantity">
+                                <form action="/update_cart_item" method="POST" style="display: inline;">
+                                    <input type="hidden" name="cart_item_id" value="{{ item.cart_item_id }}">
+                                    <label for="quantity">Quantity:</label>
+                                    <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" min="1">
+                                    <button type="submit" class="cart-item-update">Update</button>
+                                </form>
+                            </div>
+                        </div>
+                        <form action="/remove_cart_item" method="POST" style="display: inline;">
+                            <input type="hidden" name="cart_item_id" value="{{ item.cart_item_id }}">
+                            <button type="submit" class="cart-item-remove">Delete</button>
+                        </form>
+                    </div>
+                {% endfor %}
+                <div class="cart-total">
+                    Total: <span>{{ total_price }} VND</span>
+                </div>
+                <div class="cart-actions">
+                    <a href="/customer_dashboard" class="cart-action-button">Continue Shopping</a>
+                    <a href="/checkout" class="cart-action-button">Proceed to Checkout</a>
+                </div>
+            </div>
+            {% else %}
+                <div class="empty-cart-message">
+                    <i class="fa-solid fa-cart-arrow-down" style="font-size: 50px; color: #ff6347;"></i>
+                    <h2>Your cart is currently empty!</h2>
+                    <p>Add more products to your cart and start shopping.</p>
+                    <a href="/customer_dashboard" class="cart-action-button">Continue Shopping</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    
+    <footer>
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    
+                    <div class="footer-section">
+                        <div class="footer-info">
+                            <a href="/admin_dashboard" class="footer-logo">
+                                <h2>Moonwalker Cake Shop</h2>
+                            </a>
+                            <div class="footer-title">
+                                Sweet Delights & Memorable Moments
+                            </div>
+                            <div class="footer-company">
+                                <div class="footer-item">
+                                    <span>Phone:</span>
+                                    <a href="tel:0123456789">0123-456-789</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Email:</span>
+                                    <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Address:</span>
+                                    <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Opening Hours</div>
+                        <div class="footer-hours">
+                            <div class="footer-item">
+                                <span>Monday - Friday:</span>
+                                <a>8:00 AM - 9:00 PM</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Saturday - Sunday:</span>
+                                <a>7:00 AM - 10:00 PM</a>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Follow Us</div>
+                        <div class="social-links">
+                            <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

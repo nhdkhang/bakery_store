@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS: Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_layout.css')}}">
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Moonwalker Cake Shop</h1>
+        </div>
+    </header>
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/admin_dashboard" class="nav-link">Home</a>
+            <a href="/admin_products" class="nav-link">Products</a>
+            <a href="/admin_categories" class="nav-link">Categories</a>
+            <a href="/admin_orders" class="nav-link">Orders</a>
+            <a href="/admin_statistics" class="nav-link">Statistics</a>
+            <a href="/admin_promotions" class="nav-link">Promotions</a>
+            <a href="/admin_membership" class="nav-link">Memberships</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>    
+    <div class="container">
+        <h2 class="admin-welcome">Welcome, Admin!</h2>
+        <div class="dashboard-cards">
+            <div class="card">
+                <i class="fas fa-box"></i>
+                <h3>Products</h3>
+                <p>Managing list of products</p>
+                <a href="/admin_products" class="btn btn-primary">See Details</a>
+            </div>
+            <div class="card">
+                <i class="fas fa-list"></i>
+                <h3>Categories</h3>
+                <p>Managing list of categories</p>
+                <a href="/admin_categories" class="btn btn-primary">See Details</a>
+            </div>
+            <div class="card">
+                <i class="fas fa-shopping-cart"></i>
+                <h3>Orders</h3>
+                <p>Accepting and managing orders</p>
+                <a href="/admin_orders" class="btn btn-primary">See Details</a>
+            </div>
+            <div class="card">
+                <i class="fas fa-truck-fast"></i>
+                <h3>Statistics</h3>
+                <p>Controlling the income and products sold</p>
+                <a href="/admin_statistics" class="btn btn-primary">See Details</a>
+            </div>
+            <div class="card">
+                <i class="fa-regular fa-address-card"></i>
+                <h3>Memberships</h3>
+                <p>Managing customer memberships' requests</p>
+                <a href="/admin_membership" class="btn btn-primary">See Details</a>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-gift"></i>
+                <h3>Promotions</h3>
+                <p>Controlling promotions</p>
+                <a href="/admin_promotions" class="btn btn-primary">See Details</a>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    
+                    <div class="footer-section">
+                        <div class="footer-info">
+                            <a href="/admin_dashboard" class="footer-logo">
+                                <h2>Moonwalker Cake Shop</h2>
+                            </a>
+                            <div class="footer-title">
+                                Sweet Delights & Memorable Moments
+                            </div>
+                            <div class="footer-company">
+                                <div class="footer-item">
+                                    <span>Phone:</span>
+                                    <a href="tel:0123456789">0123-456-789</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Email:</span>
+                                    <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Address:</span>
+                                    <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-section">
+                        <div class="footer-title">Opening Hours</div>
+                        <div class="footer-hours">
+                            <div class="footer-item">
+                                <span>Monday - Friday:</span>
+                                <a>8:00 AM - 9:00 PM</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Saturday - Sunday:</span>
+                                <a>7:00 AM - 10:00 PM</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-section">
+                        <div class="footer-title">Follow Us</div>
+                        <div class="social-links">
+                            <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

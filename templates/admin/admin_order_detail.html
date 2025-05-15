@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Order Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_layout.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Moonwalker Cake Shop</h1>
+    </header>
+    <div class="order-detail-container">
+        <h1>Order Details #{{ order.order_id }}</h1>
+        <div class="admin-order-info">
+            <p><strong>Customer:</strong> {{ order.fullname }}</p>
+            <p><strong>Phone:</strong> {{ order.phone_number }}</p>
+            <p><strong>Total:</strong> {{ "{:,.0f}".format(order.total_price) }} VND</p>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+            <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+            <p><strong>Payment Status:</strong> {{ order.payment_status }}</p>
+            {% if order.payment_proof %}
+            <p>
+                <strong>Payment Proof:</strong>
+                <a href="/static/uploads/payments/{{ order.payment_proof }}" target="_blank">
+                    View Proof
+                </a>
+            </p>
+            {% endif %}
+        </div>
+
+        <h2>Order Items</h2>
+        <table class="admin-order-items">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_items %}
+                <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ "{:,.0f}".format(item.subtotal) }} VND</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-primary">Back to Orders</a>
+    </div>
+
+    
+    <footer>
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-section">
+                        <div class="footer-info">
+                            <a href="/admin_dashboard" class="footer-logo">
+                                <h2>Moonwalker Cake Shop</h2>
+                            </a>
+                            <div class="footer-title">
+                                Sweet Delights & Memorable Moments
+                            </div>
+                            <div class="footer-company">
+                                <div class="footer-item">
+                                    <span>Phone:</span>
+                                    <a href="tel:0123456789">0123-456-789</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Email:</span>
+                                    <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Address:</span>
+                                    <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-section">
+                        <div class="footer-title">Opening Hours</div>
+                        <div class="footer-hours">
+                            <div class="footer-item">
+                                <span>Monday - Friday:</span>
+                                <a>8:00 AM - 9:00 PM</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Saturday - Sunday:</span>
+                                <a>7:00 AM - 10:00 PM</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-section">
+                        <div class="footer-title">Follow Us</div>
+                        <div class="social-links">
+                            <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

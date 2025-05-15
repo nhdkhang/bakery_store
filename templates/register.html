@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS: Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #5a3e36;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .flash-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .flash-message.danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+
+        .register-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: #ff6347;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #5a3e36;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ff6347;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #ff6347;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #e55347;
+            transform: translateY(-2px);
+        }
+
+        a {
+            color: #ff6347;
+            text-decoration: none;
+            font-size: 14px;
+            display: block;
+            margin-top: 15px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                padding: 20px 0;
+            }
+
+            .register-container {
+                width: 90%;
+                max-width: 400px;
+                padding: 20px;
+                margin: 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            textarea {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            .flash-message {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                width: 85%;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            label {
+                font-size: 14px;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            textarea {
+                margin-bottom: 12px;
+            }
+
+            a {
+                padding: 10px 0;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<body>
+    <div class="register-container">
+        <h1>Register</h1>
+        <form method="POST" action="/register">
+            <label for="email">Email:</label>
+            <input type="text" name="email" required>
+            <br>
+            <label for="password">Password:</label>
+            <input type="password" name="password" required>
+            <br>
+            <label for="fullname">Full Name:</label>
+            <input type="text" name="fullname" required>
+            <br>
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" name="phone_number" required>
+            <br>
+            <label for="address">Address:</label>
+            <textarea name="address" required></textarea>
+            <br>
+            <button type="submit">Register</button>
+        </form>
+        <a href="/">Back to Home</a>
+    </div>
+</body>
+
+</html>

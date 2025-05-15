@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS: Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Moonwalker Cake Shop</h1>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="container">
+        <div class="checkout-grid">
+            <div class="checkout-details">
+                <h2>Confirming the Order</h2>
+                <div class="order-details">
+                    <h3>Order Timestamp</h3>
+                    <p><strong>Order ID:</strong> {{ order.order_id if order else 'Pending' }}</p>
+                    <p><strong>Ordering Date:</strong> {{ order.created_at if order else 'N/A' }}</p>
+                </div>
+    
+                <div class="order-items">
+                    <h3>Order Detail</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if order_items %}
+                                {% for item in order_items %}
+                                <tr>
+                                    <td>{{ item.product_name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ "{:,.0f}".format(item.price * item.quantity) if item else '0' }} VND</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3">No product is in the cart.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="order-summary">
+                    <h3>Order Overview</h3>                
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>{{ "{:,.0f}".format(subtotal) if subtotal else '0' }} VND</span>
+                    </div>
+                    
+                    {% if session.get('applied_promotion') %}
+                    <div class="summary-row discount">
+                        <span>Discount({{ session.applied_promotion.discount_percentage }}%)</span>
+                        <span>-{{ "{:,.0f}".format(session.applied_promotion.discount_amount|float) }} VND</span>
+                    </div>
+                    <input type="hidden" name="promotion_id" value="{{ session.applied_promotion.promotion_id }}">
+                    {% endif %}
+            
+                    {% if membership_discount and membership_discount > 0 %}
+                    <div class="summary-row membership-discount">
+                        <span style="color: green;">Membership's Discount</span>
+                        <span style="color: green;">-{{ "{:,.0f}".format(membership_discount) }} VND</span>
+                    </div>
+                    {% endif %}
+            
+                    <div class="summary-row">
+                        <span>Shipping Fee</span>
+                        <span>{{ "{:,.0f}".format(shipping_fee) if shipping_fee else '0' }} VND</span>
+                    </div>
+                    <div class="promo-suggestions">
+                        <h4>Available Promotions</h4>
+                        {% if available_promotions and available_promotions|length > 0 %}
+                            <ul>
+                                {% for promo in available_promotions %}
+                                <li>
+                                    <strong>{{ promo.promotion_code }}</strong> - 
+                                    {{ promo.discount_percentage }}% off
+                                    (Valid until {{ promo.end_date.strftime('%Y-%m-%d') }})
+                                    {% if promo.min_order_amount %}
+                                    - Minimum order: {{ "{:,.0f}".format(promo.min_order_amount) }} VND
+                                    {% endif %}
+                                    {% if not session.get('applied_promotion') %}
+                                    <form method="POST" action="{{ url_for('apply_promotion_code') }}" style="display: inline;">
+                                        <input type="hidden" name="promo_code" value="{{ promo.promotion_code }}">
+                                        <input type="hidden" name="order_total" value="{{ subtotal }}">
+                                        <button type="submit" class="apply-promo-btn">Apply</button>
+                                    </form>
+                                    {% else %}
+                                    <span style="color: #dc3545; font-size: 0.9em;">(Only one promotion can be applied per order)</span>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No available promotions at this time.</p>
+                        {% endif %}
+                    </div>
+
+                    {% if session.get('applied_promotion') %}
+                    <div class="applied-promotion">
+                        <p>Promotion: {{ session.applied_promotion.code }}
+                        <form method="POST" action="{{ url_for('remove_promotion_code') }}" style="display: inline;">
+                            <button type="submit" class="remove-promo">×</button>
+                        </form>
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="total-price">
+                        <span>Total</span>
+                        <span>{{ "{:,.0f}".format(total) if total else '0' }} VND</span>
+                    </div>
+                </div>
+                <br>
+                <div class="payment-method">
+                    <h3>Payment Method</h3>
+                    <form action="{{ url_for('create_order') }}" method="POST" 
+                    enctype="multipart/form-data" id="orderForm">
+                        <div class="payment-select-container">
+                            <select name="payment_method" class="payment-select" required id="paymentMethod">
+                                <option value="">Choose your payment method</option>
+                                <option value="cash">Cash</option>
+                                <option value="deposit">Bank transfer</option>
+                            </select>
+                        </div>
+                        
+                        <div id="deposit-section" style="display: none; margin-top: 20px;">
+                            <h4>Confirming your Bank Transfer</h4>
+                            <div class="bank-info" style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                                <p><strong>Banking Inforation:</strong></p>
+                                <p>Bank: Vietcombank</p>
+                                <p>Account ID: 1234567890</p>
+                                <p>Account Holder's Name: MOONWALKER CAKE SHOP</p>
+                                <p>Notes: MWC {{ order.order_id if order else 'ORDER' }}</p>
+                            </div>
+                            <input type="file" name="payment_proof" accept="image/*" class="form-control">
+                            <p class="note">* Please upload your proof of bank transfer</p>
+                        </div>
+
+                        <input type="hidden" name="total_amount" value="{{ total }}">
+                        {% if session.get('applied_promotion') %}
+                        <input type="hidden" name="promotion_code" value="{{ session.applied_promotion.code }}">
+                        {% endif %}
+                    </form>
+                </div>
+                <br>
+                <button type="submit" class="checkout-button" form="orderForm">Confirm Your Order</button>
+                <div class="back-to-cart" style="margin-top: 20px; text-align: center;">
+                <a href="{{ url_for('cart') }}" style="display: inline-block; padding: 10px 20px; background-color: #fff; color: #ff6347; border: 1px solid #ff6347; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.3s ease;">
+                </i> Back to Cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    
+                    <div class="footer-section">
+                        <div class="footer-info">
+                            <a href="/admin_dashboard" class="footer-logo">
+                                <h2>Moonwalker Cake Shop</h2>
+                            </a>
+                            <div class="footer-title">
+                                Sweet Delights & Memorable Moments
+                            </div>
+                            <div class="footer-company">
+                                <div class="footer-item">
+                                    <span>Phone:</span>
+                                    <a href="tel:0123456789">0123-456-789</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Email:</span>
+                                    <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Address:</span>
+                                    <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Opening Hours</div>
+                        <div class="footer-hours">
+                            <div class="footer-item">
+                                <span>Monday - Friday:</span>
+                                <a>8:00 AM - 9:00 PM</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Saturday - Sunday:</span>
+                                <a>7:00 AM - 10:00 PM</a>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Follow Us</div>
+                        <div class="social-links">
+                            <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+<script>
+    document.getElementById('paymentMethod').addEventListener('change', function() {
+        var depositSection = document.getElementById('deposit-section');
+        if (this.value === 'deposit') {
+            depositSection.style.display = 'block';
+        } else {
+            depositSection.style.display = 'none';
+        }
+    });
+</script>
+</html>

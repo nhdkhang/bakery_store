@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS: Add a Review</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <h1>Moonwalker Cake Shop</h1>
+    </header>
+    <div class="review-container">
+        <h1>Add Review for Order #{{ order_id }}</h1>
+        <form method="POST">
+            {% for item in order_items %}
+            <div class="review-item">
+                <h3>{{ item.product_name }}</h3>
+                <div class="form-group">
+                    <label>Rating (1-5):</label>
+                    <input type="number" name="rating_{{ item.product_id }}" min="1" max="5" required>
+                </div>
+                <div class="form-group">
+                    <label>Comment (optional):</label>
+                    <textarea name="comment_{{ item.product_id }}"></textarea>
+                </div>
+            </div>
+            {% endfor %}
+            <button type="submit">Submit Review</button>
+        </form>
+        <br>
+        <button class="btn btn-secondary"
+        onclick="window.location.href='/order_detail/{{ session.customer_id }}/{{ order_id }}';"
+        style="text-align:center;">
+        Back to Order Detail</button>
+    </div>
+    <footer>
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-section">
+                        <div class="footer-info">
+                            <a href="/admin_dashboard" class="footer-logo">
+                                <h2>Moonwalker Cake Shop</h2>
+                            </a>
+                            <div class="footer-title">
+                                Sweet Delights & Memorable Moments
+                            </div>
+                            <div class="footer-company">
+                                <div class="footer-item">
+                                    <span>Phone:</span>
+                                    <a href="tel:0123456789">0123-456-789</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Email:</span>
+                                    <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Address:</span>
+                                    <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Opening Hours</div>
+                        <div class="footer-hours">
+                            <div class="footer-item">
+                                <span>Monday - Friday:</span>
+                                <a>8:00 AM - 9:00 PM</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Saturday - Sunday:</span>
+                                <a>7:00 AM - 10:00 PM</a>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Follow Us</div>
+                        <div class="social-links">
+                            <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

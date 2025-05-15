@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCS: Order History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  </head>
+  <body>
+    <header>
+      <div class="header-title">
+        <h1>Moonwalker Cake Shop</h1>
+      </div>
+    </header>
+    <nav class="nav-menu">
+      <div class="nav-container">
+          <a href="/customer_dashboard" class="nav-link">Home</a>
+          <a href="/customer_profile" class="nav-link">Profile</a>
+          <a href="/cart" class="nav-link">Cart</a>
+          <a href="/order_history/{{ session.customer_id }}" class="nav-link">Order History</a>
+          <a href="/wishlist" class="nav-link">Wishlist</a>
+          <a href="/logout" class="nav-link">Logout</a>
+      </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <div class="order-container">
+      <h2>Order History</h2>
+      <ul class="order-list">
+        {% if orders %} {% for order in orders %}
+        <li class="order-item">
+          <div>
+            <div class="order-id">Order #{{ order.order_id }}</div>
+            <div>Order Date: <strong>{{ order.created_at }}</strong></div>
+            <div>
+              Total:
+              <strong>{{ "{:,.0f}".format(order.total_price) }} VND</strong>
+            </div>
+            <div class="order-status status-{{ order.status }}">
+              {{ order.status|capitalize }}
+            </div>
+            {% if order.status == 'cancelled' and order.reason_text %}
+            <div class="cancellation-reason">
+              <i class="fas fa-info-circle"></i> Reason: {{ order.reason_text }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="button-group">
+            <button class="view-button" onclick="window.location.href='/order_detail/{{ session.customer_id }}/{{ order.order_id }}';">Details</button>
+            {% if order.status == 'completed' and not order.has_review %}
+            <button class="view-button" onclick="window.location.href='/add_review/{{ session.customer_id }}/{{ order.order_id }}';">Review</button>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %} {% else %}
+        <p>No orders to show.</p>
+        {% endif %}
+      </ul>
+      <button class="btn btn-secondary"onclick="window.location.href='/customer_dashboard';">Back to Home</button>
+    </div>
+  </body>
+
+  <footer>
+    <div class="footer-main">
+        <div class="container">
+            <div class="footer-grid">
+                
+                <div class="footer-section">
+                    <div class="footer-info">
+                        <a href="/admin_dashboard" class="footer-logo">
+                            <h2>Moonwalker Cake Shop</h2>
+                        </a>
+                        <div class="footer-title">
+                            Sweet Delights & Memorable Moments
+                        </div>
+                        <div class="footer-company">
+                            <div class="footer-item">
+                                <span>Phone:</span>
+                                <a href="tel:0123456789">0123-456-789</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Email:</span>
+                                <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Address:</span>
+                                <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="footer-section">
+                    <div class="footer-title">Opening Hours</div>
+                    <div class="footer-hours">
+                        <div class="footer-item">
+                            <span>Monday - Friday:</span>
+                            <a>8:00 AM - 9:00 PM</a>
+                        </div>
+                        <div class="footer-item">
+                            <span>Saturday - Sunday:</span>
+                            <a>7:00 AM - 10:00 PM</a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="footer-section">
+                    <div class="footer-title">Follow Us</div>
+                    <div class="social-links">
+                        <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+</html>

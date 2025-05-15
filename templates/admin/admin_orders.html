@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang = en>
+    <head>
+        <meta charset = UTF-8>
+        <meta name = viewport content = width=device-width, initial-scale=1.0>
+        <title>Admin: Confirm Orders</title>
+        <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_layout.css') }}">
+    </head>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Moonwalker Cake Shop</h1>
+        </div>
+    </header>
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/admin_dashboard" class="nav-link">Home</a>
+            <a href="/admin_products" class="nav-link">Products</a>
+            <a href="/admin_categories" class="nav-link">Categories</a>
+            <a href="/admin_orders" class="nav-link">Orders</a>
+            <a href="/admin_statistics" class="nav-link">Statistics</a>
+            <a href="/admin_promotions" class="nav-link">Promotions</a>
+            <a href="/admin_membership" class="nav-link">Memberships</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <main>
+        <h2 class="admin-orders">Orders</h2>
+        <div class="admin-orders-container">
+            <table>
+                 <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th onclick="sortTable(1)">Order ID <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(2)">Order's Placement Date <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(3)">Order Recipient <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(4)">Phone Number <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(5)">Total <i class="fas fa-sort"></i></th>
+                        <th>Order Details</th>
+                        <th onclick="sortTable(7)">Payment Method <i class="fas fa-sort"></i></th>
+                        <th>Payment Approval</th>
+                        <th onclick="sortTable(9)">Order Status <i class="fas fa-sort"></i></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if orders %}
+                        {% for order in orders %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ order.order_id }}</td>
+                                <td>{{ order.created_at }}</td>
+                                <td>{{ order.fullname }}</td>
+                                <td>{{ order.phone_number }}</td>
+                                <td>{{ order.total_price }} VNĐ</td>
+                                <td>
+                                    <a href="{{ url_for ('admin_order_detail', order_id=order.order_id) }}"
+                                       class="btn btn-primary">
+                                        View Details
+                                    </a>
+                                </td>
+                                <td>{{ order.payment_method }}</td>
+                                <td>
+                                    {% if order.payment_method == 'deposit' and order.payment_proof %}
+                                    <a href="/static/uploads/payments/{{ order.payment_proof }}" target="_blank">
+                                        <img src="/static/uploads/payments/{{ order.payment_proof }}" 
+                                             alt="Payment Proof" 
+                                             style="max-width: 100px; cursor: pointer;"
+                                             onclick="window.open(this.src)">
+                                    </a>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                                </td>
+                                <td class="order-status">
+                                    {% if order.status == 'processing' %}
+                                    <div class="status-processing">Processing</div>
+                                {% elif order.status == 'accepted' %}
+                                    <div class="status-accepted">Accepted</div>
+                                {% elif order.status == 'delivering' %}
+                                    <div class="status-delivering">Delivering</div>
+                                {% elif order.status == 'completed' %}
+                                    <div class="status-completed">Completed</div>
+                                {% elif order.status == 'cancelled' %}
+                                    <div class="status-cancelled">Cancelled</div>
+                                {% endif %}
+                                </td>
+                                <td>
+                                        {% if order.status != 'completed' and order.status != 'cancelled' %}
+                                            <form method="POST" action="{{ url_for('admin_orders') }}">
+                                                <input type="hidden" name="order_id" value="{{ order.order_id }}">
+                                                <button type="submit" class="btn btn-primary">
+                                                    {% if order.status == 'processing' %}
+                                                        Accept Order
+                                                    {% elif order.status == 'accepted' %}
+                                                        Proceed to Delivery
+                                                    {% elif order.status == 'delivering' %}
+                                                        Complete Order
+                                                    {% endif %}
+                                                </button>
+                                            </form>
+                                            {% if order.payment_method == 'deposit' %}
+                                                <form method="POST" action="{{ url_for('cancel_order') }}" style="margin-top: 5px;" id="cancelForm{{ order.order_id }}">
+                                                    <input type="hidden" name="order_id" value="{{ order.order_id }}">
+                                                    <button type="button" onclick="openCancelModal('{{ order.order_id }}')" class="btn btn-danger">Cancel Order</button>
+                                                </form>
+                                            {% endif %}
+                                        {% elif order.status == 'completed' %}
+                                            <span class="completed-status">Completed</span>
+                                        {% else %}
+                                            <span class="cancelled-status">Cancelled</span>
+                                        {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="9">No order to show.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+  
+    </main>
+    <div id="cancelOrderModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+            <span class="close" onclick="document.getElementById('cancelOrderModal').style.display='none'" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h2 style="color: #ff6347; font-family: 'Pacifico', cursive;">Cancel Order</h2>
+            <p>Please select a reason for cancelling this order:</p>
+            
+            <form id="cancelOrderForm" action="{{ url_for('cancel_order') }}" method="POST">
+                <input type="hidden" id="cancel_order_id" name="order_id">
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="reason_id" style="display: block; margin-bottom: 5px; font-weight: 500;">Cancellation Reason:</label>
+                    <select id="reason_id" name="reason_id" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" required>
+                        <option value="">-- Select a reason --</option>
+                        {% for reason in reasons %}
+                        <option value="{{ reason.reason_id }}">{{ reason.reason_text }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div style="text-align: right;">
+                    <button type="button" onclick="document.getElementById('cancelOrderModal').style.display='none'" style="background-color: #ccc; color: #333; padding: 10px 15px; border: none; border-radius: 4px; margin-right: 10px; cursor: pointer;">Cancel</button>
+                    <button type="submit" style="background-color: #ff6347; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;">Confirm Cancellation</button>
+                </div>
+            </form>
+        </div>
+    </div> 
+    <script>
+        function openCancelModal(orderId) {
+            document.getElementById('cancel_order_id').value = orderId;
+            document.getElementById('cancelOrderModal').style.display = 'block';
+            return false;
+        }
+
+        window.onclick = function(event) {
+            var modal = document.getElementById('cancelOrderModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        function sortTable(columnIndex) {
+            const table = document.querySelector('.admin-orders-container table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const isAscending = table.getAttribute('data-sort-asc') === 'true';
+            
+            rows.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim();
+                const bValue = b.cells[columnIndex].textContent.trim();
+                
+                // Special handling for numeric columns (Order ID, Total)
+                if (columnIndex === 1 || columnIndex === 5) {
+                    const aNum = parseFloat(aValue.replace(/[^0-9.]/g, ''));
+                    const bNum = parseFloat(bValue.replace(/[^0-9.]/g, ''));
+                    return isAscending ? aNum - bNum : bNum - aNum;
+                }
+                
+                // Special handling for date column
+                if (columnIndex === 2) {
+                    const aDate = new Date(aValue);
+                    const bDate = new Date(bValue);
+                    return isAscending ? aDate - bDate : bDate - aDate;
+                }
+                
+                // Default string comparison
+                return isAscending 
+                    ? aValue.localeCompare(bValue) 
+                    : bValue.localeCompare(aValue);
+            });
+
+            // Clear existing rows
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+            
+            // Add sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+            
+            // Toggle sort direction for next click
+            table.setAttribute('data-sort-asc', !isAscending);
+            
+            // Update sort icons
+            updateSortIcons(columnIndex, !isAscending);
+        }
+        
+        function updateSortIcons(columnIndex, isAscending) {
+            const icons = document.querySelectorAll('th i.fa-sort');
+            icons.forEach(icon => {
+                icon.className = 'fas fa-sort';
+            });
+            
+            const activeIcon = document.querySelector(`th:nth-child(${columnIndex + 1}) i.fa-sort`);
+            if (activeIcon) {
+                activeIcon.className = isAscending ? 'fas fa-sort-up' : 'fas fa-sort-down';
+            }
+        }
+    </script>
+    <footer>
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    
+                    <div class="footer-section">
+                        <div class="footer-info">
+                            <a href="/" class="footer-logo">
+                                <h2>Moonwalker Cake Shop</h2>
+                            </a>
+                            <div class="footer-title">
+                                Sweet Delights & Memorable Moments
+                            </div>
+                            <div class="footer-company">
+                                <div class="footer-item">
+                                    <span>Phone:</span>
+                                    <a href="tel:0123456789">0123-456-789</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Email:</span>
+                                    <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Address:</span>
+                                    <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Opening Hours</div>
+                        <div class="footer-hours">
+                            <div class="footer-item">
+                                <span>Monday - Friday:</span>
+                                <a>8:00 AM - 9:00 PM</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Saturday - Sunday:</span>
+                                <a>7:00 AM - 10:00 PM</a>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Follow Us</div>
+                        <div class="social-links">
+                            <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

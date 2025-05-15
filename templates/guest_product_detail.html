@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    
+    <header>
+        <div class="header-title">
+            <h1>Moonwalker Cake Shop</h1>
+        </div>
+    </header>
+
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/products" class="nav-link">Products</a>
+            <a href="/reviews" class="nav-link">Reviews</a>
+            <a href="/about_us" class="nav-link">About Us</a>
+        </div>
+    </nav> 
+        
+        <div class="container">
+            <div class="guest-product-detailed">
+                <div class="guest-product-image">
+                    <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.product_name }}">
+                </div>
+                <div class="guest-product-info">
+                    <h1 class="guest-product-name">{{ product.product_name }}</h1>
+                    <p class="guest-product-price">{{ "{:,.0f}".format(product.price) }} VNĐ</p>
+                    <p class="guest-product-category">Category: {{ product.category_name }}</p>
+                    <p class="guest-product-description">{{ product.description }}</p>
+                    <div class="guest-product-actions">
+                        <form action="/add_to_cart" method="POST">
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 600; font-size: 16px; background-color: #ff6347; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                            Add to Cart
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-primary" onclick="window.location.href='/products'">
+                            Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        
+        <footer>
+            <div class="footer-main">
+                <div class="container">
+                    <div class="footer-grid">
+                        
+                        <div class="footer-section">
+                            <div class="footer-info">
+                                <a href="/admin_dashboard" class="footer-logo">
+                                    <h2>Moonwalker Cake Shop</h2>
+                                </a>
+                                <div class="footer-title">
+                                    Sweet Delights & Memorable Moments
+                                </div>
+                                <div class="footer-company">
+                                    <div class="footer-item">
+                                        <span>Phone:</span>
+                                        <a href="tel:0123456789">0123-456-789</a>
+                                    </div>
+                                    <div class="footer-item">
+                                        <span>Email:</span>
+                                        <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                    </div>
+                                    <div class="footer-item">
+                                        <span>Address:</span>
+                                        <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        
+                        <div class="footer-section">
+                            <div class="footer-title">Opening Hours</div>
+                            <div class="footer-hours">
+                                <div class="footer-item">
+                                    <span>Monday - Friday:</span>
+                                    <a>8:00 AM - 9:00 PM</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Saturday - Sunday:</span>
+                                    <a>7:00 AM - 10:00 PM</a>
+                                </div>
+                            </div>
+                        </div>
+        
+                        
+                        <div class="footer-section">
+                            <div class="footer-title">Follow Us</div>
+                            <div class="social-links">
+                                <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                                <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
+    </html>

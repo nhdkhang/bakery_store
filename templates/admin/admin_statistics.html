@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Statistics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_layout.css') }}">
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Moonwalker Cake Shop</h1>
+        </div>
+    </header>
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/admin_dashboard" class="nav-link">Home</a>
+            <a href="/admin_products" class="nav-link">Products</a>
+            <a href="/admin_categories" class="nav-link">Categories</a>
+            <a href="/admin_orders" class="nav-link">Orders</a>
+            <a href="/admin_statistics" class="nav-link">Statistics</a>
+            <a href="/admin_promotions" class="nav-link">Promotions</a>
+            <a href="/admin_membership" class="nav-link">Memberships</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="statistics">
+        <div class="statistic-container">
+            <h2>Statistics</h2>
+            <a href="/generate_report" class="btn btn-primary">
+                <i class="fas fa-download"></i> Export as DOCX
+            </a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Month/Year</th>
+                    <th>Quantity of Orders</th>
+                    <th>Income</th>
+                    <th>Completed Orders</th>
+                    <th>Processing Orders</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month_stat in monthly_stats %}
+                <tr>
+                    <td>{{ "%02d/%d" | format(month_stat.month, month_stat.year) }}</td>
+                    <td>{{ month_stat.total_orders }}</td>
+                    <td>{{ "{:,.0f}".format(month_stat.revenue) }} VNĐ</td>
+                    <td>{{ month_stat.completed_orders }}</td>
+                    <td>{{ month_stat.processing_orders }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total</th>
+                    <th>{{ total_stats.total_orders }}</th>
+                    <th>{{ "{:,.0f}".format(total_stats.total_revenue) }} VNĐ</th>
+                    <th>{{ total_stats.total_completed }}</th>
+                    <th>{{ total_stats.total_processing }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="statistics">
+        <h2>Top 10 Most Sold Products</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng đã bán</th>
+                    <th>Doanh thu</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in top_products %}
+                <tr>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.quantity_sold }}</td>
+                    <td>{{ "{:,.0f}".format(product.total_revenue) }} VNĐ</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div> 
+<script>
+document.getElementById('downloadStats').addEventListener('click', function() {
+    const { Document, Paragraph, TextRun, Table, TableRow, TableCell, AlignmentType, HeadingLevel } = docx;
+
+    // Helper function to create table rows from HTML table
+    function createTableRows(htmlTable) {
+        const rows = [];
+        // Add header row
+        const headerCells = Array.from(htmlTable.querySelectorAll('thead th')).map(th => 
+            new TableCell({
+                children: [new Paragraph({ text: th.textContent.trim(), bold: true })]
+            })
+        );
+        rows.push(new TableRow({ children: headerCells }));
+
+        // Add data rows
+        htmlTable.querySelectorAll('tbody tr').forEach(row => {
+            const cells = Array.from(row.cells).map(cell => 
+                new TableCell({
+                    children: [new Paragraph({ text: cell.textContent.trim() })]
+                })
+            );
+            rows.push(new TableRow({ children: cells }));
+        });
+
+        // Add footer row if exists
+        const footerRow = htmlTable.querySelector('tfoot tr');
+        if (footerRow) {
+            const footerCells = Array.from(footerRow.cells).map(cell => 
+                new TableCell({
+                    children: [new Paragraph({ 
+                        text: cell.textContent.trim(), 
+                        bold: true 
+                    })]
+                })
+            );
+            rows.push(new TableRow({ children: footerCells }));
+        }
+
+        return rows;
+    }
+
+    // Create document
+    const doc = new Document({
+        sections: [{
+            properties: {},
+            children: [
+                new Paragraph({
+                    text: "Moonwalker Cake Shop - Statistics Report",
+                    heading: HeadingLevel.HEADING_1,
+                    alignment: AlignmentType.CENTER
+                }),
+                new Paragraph({ 
+                    text: "Monthly Statistics", 
+                    heading: HeadingLevel.HEADING_2 
+                }),
+                new Table({
+                    rows: createTableRows(document.querySelector('table:first-of-type')),
+                    width: { size: 100, type: "PERCENTAGE" }
+                }),
+                new Paragraph({ 
+                    text: "Top Selling Products", 
+                    heading: HeadingLevel.HEADING_2 
+                }),
+                new Table({
+                    rows: createTableRows(document.querySelector('table:last-of-type')),
+                    width: { size: 100, type: "PERCENTAGE" }
+                }),
+                new Paragraph({
+                    text: `Report generated on ${new Date().toLocaleDateString()}`,
+                    alignment: AlignmentType.RIGHT
+                })
+            ]
+        }]
+    });
+
+    // Generate and download the document
+    docx.Packer.toBlob(doc).then(blob => {
+        saveAs(blob, `Moonwalker_Statistics_${new Date().toISOString().slice(0,10)}.docx`);
+    }).catch(error => {
+        console.error('Error generating DOCX:', error);
+        alert('Error generating document. Please check console for details.');
+    });
+});
+</script>
+<footer>
+    <div class="footer-main">
+        <div class="container">
+            <div class="footer-grid">
+                
+                <div class="footer-section">
+                    <div class="footer-info">
+                        <a href="/" class="footer-logo">
+                            <h2>Moonwalker Cake Shop</h2>
+                        </a>
+                        <div class="footer-title">
+                            Sweet Delights & Memorable Moments
+                        </div>
+                        <div class="footer-company">
+                            <div class="footer-item">
+                                <span>Phone:</span>
+                                <a href="tel:0123456789">0123-456-789</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Email:</span>
+                                <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Address:</span>
+                                <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="footer-section">
+                    <div class="footer-title">Opening Hours</div>
+                    <div class="footer-hours">
+                        <div class="footer-item">
+                            <span>Monday - Friday:</span>
+                            <a>8:00 AM - 9:00 PM</a>
+                        </div>
+                        <div class="footer-item">
+                            <span>Saturday - Sunday:</span>
+                            <a>7:00 AM - 10:00 PM</a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="footer-section">
+                    <div class="footer-title">Follow Us</div>
+                    <div class="social-links">
+                        <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

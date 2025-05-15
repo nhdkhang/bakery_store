@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS: Order Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    
+    <header>
+        <h1>Moonwalker Cake Shop</h1>
+    </header>
+
+    
+    <div class="order-detail-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <h1 class="order-detail-title">Order Detail</h1>
+        <div class="order-info-section">
+            <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+            <p><strong>Net Total:</strong>
+                {% if order_items %}
+                {{ "{:,.0f}".format(order_items | sum(attribute='subtotal')) }} VND
+            {% else %}
+                0 VND
+            {% endif %}
+            </p>
+            <p><strong>Order Date:</strong> {{ order.created_at }}</p>
+            <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+            <p><strong>Payment Status:</strong> {{ order.payment_status }}</p>
+            {% if order.promotion_id %}
+            <p><strong>Promotion Code Applied:</strong>
+                {{ promotion.promotion_code }} (for {{ promotion.discount_percentage }}% off before 200000 VND of Shipping Fee)
+            </p>
+            {% endif %}
+            <p><strong>Discounted Price:</strong> {{ "{:,.0f}".format(order.total_price) }} VND</p>
+        </div>
+        <div class="order-items-section">
+            <table class="order-items-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ "{:,.0f}".format(item.subtotal) }} VND</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if order.status == 'completed' %}
+        <div class="order-reviews-section">
+          <h4>Product Reviews:</h4>
+          {% if order.reviews %}
+            {% for review in order.reviews %}
+            <div class="review-item">
+              <div class="review-product">{{ review.product_name }}</div>
+              <div class="review-rating">Rating: {{ review.rating }}/5</div>
+              <div class="review-comment">{{ review.comment }}</div>
+              <div class="review-date">{{ review.created_at }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="no-reviews">No reviews submitted for this order.</p>
+            <button class="view-button" onclick="window.location.href='/add_review/{{ session.customer_id }}/{{ order.order_id }}';">Add a Review</button>
+          {% endif %}
+        </div>
+        {% endif %}
+        <div class="navigation-section">
+            <a href="{{ url_for('order_history', customer_id=session['customer_id']) }}" class="back-link">Back to Order History</a>
+        </div>       
+    </div>
+    <footer>
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    
+                    <div class="footer-section">
+                        <div class="footer-info">
+                            <a href="/admin_dashboard" class="footer-logo">
+                                <h2>Moonwalker Cake Shop</h2>
+                            </a>
+                            <div class="footer-title">
+                                Sweet Delights & Memorable Moments
+                            </div>
+                            <div class="footer-company">
+                                <div class="footer-item">
+                                    <span>Phone:</span>
+                                    <a href="tel:0123456789">0123-456-789</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Email:</span>
+                                    <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Address:</span>
+                                    <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Opening Hours</div>
+                        <div class="footer-hours">
+                            <div class="footer-item">
+                                <span>Monday - Friday:</span>
+                                <a>8:00 AM - 9:00 PM</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Saturday - Sunday:</span>
+                                <a>7:00 AM - 10:00 PM</a>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Follow Us</div>
+                        <div class="social-links">
+                            <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

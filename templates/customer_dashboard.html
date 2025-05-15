@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS: Customer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}">
+    <script src="https://kit.fontawesome.com/1d57cd4829.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div class="header-title">
+            <h1>Moonwalker Cake Shop</h1>
+        </div>
+    </header>
+    <nav class="nav-menu">
+        <div class="nav-container">
+            <a href="/customer_dashboard" class="nav-link">Home</a>
+            <a href="/customer_profile" class="nav-link">Profile</a>
+            <a href="/cart" class="nav-link">Cart</a>
+            <a href="/order_history/{{ session.customer_id }}" class="nav-link">Order History</a>
+            <a href="/wishlist" class="nav-link">Wishlist</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="search-section">
+            <div class="search-header">
+                <form action="{{ url_for('search') }}" method="GET" class="search-form">
+                    <input type="text" name="query" placeholder="Search products..." value="{{ query }}">
+                    
+                    <select name="category_id">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.category_id }}" 
+                                    {% if category.category_id == selected_category_id %}selected{% endif %}>
+                                {{ category.category_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="min_price" placeholder="Min price" value="{{ min_price }}">
+                    <input type="number" name="max_price" placeholder="Max price" value="{{ max_price }}">
+                    
+                    <select name="sort_by">
+                        <option value="">Sort by</option>
+                        <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Name: A to Z</option>
+                        <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>Name: Z to A</option>
+                    </select>
+                    
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>    
+        </div>
+
+        {% if query or selected_category_id or min_price or max_price %}
+        <h2>Search Results</h2>
+        {% if query %}
+            <p>Search term: "{{ query }}"</p>
+        {% endif %}
+        {% if selected_category_id %}
+            <p>Category: {{ categories|selectattr('category_id', 'equalto', selected_category_id)|map(attribute='category_name')|first }}</p>
+        {% endif %}
+        {% endif %}
+        {% for category in categories %}
+        {% set category_products = products|selectattr('category_id', 'equalto', category.category_id)|list %}
+        {% if category_products|length > 0 %}
+        <section>
+            <h2>{{ category.category_name }}</h2>
+            <br>
+            <h3 class="category-des">{{ category.description }}</h3>
+            <div class="product-grid">
+                {% for product in category_products %}
+                    <div class="product-card">
+                        <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.product_name }}" class="product-image">
+                        <div class="product-details">
+                            <h4 class="product-name">{{ product.product_name }}</h4>
+                            <p class="product-price">{{ "{:,.0f}".format(product.price) }} VNĐ</p>
+                            <div class="product-actions" style="display: flex; gap: 10px;">
+                                <form action="/add_to_cart" method="POST">
+                                    <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-cart-plus"></i> Add to Cart
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('add_to_wishlist') }}" method="POST">
+                                    <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                                    <button type="submit" class="btn btn-outline-danger" style="background-color: white; color: red; border: 1px solid red;">
+                                    <i class="fas fa-heart"></i>
+                                    </button>
+                                </form>
+                                <a href="{{ url_for('product_detail', product_id=product.product_id) }}" class="btn" style="background-color: white; color: #5a3e36; border: 1px solid #5a3e36;">
+                                    <i class="fas fa-search"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    
+    <footer>
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    
+                    <div class="footer-section">
+                        <div class="footer-info">
+                            <a href="/" class="footer-logo">
+                                <h2>Moonwalker Cake Shop</h2>
+                            </a>
+                            <div class="footer-title">
+                                Sweet Delights & Memorable Moments
+                            </div>
+                            <div class="footer-company">
+                                <div class="footer-item">
+                                    <span>Phone:</span>
+                                    <a href="tel:0123456789">0123-456-789</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Email:</span>
+                                    <a href="mailto:contact@moonwalkercakes.com">contact@moonwalkercakes.com</a>
+                                </div>
+                                <div class="footer-item">
+                                    <span>Address:</span>
+                                    <a>123 Baker Street, District 1, Ho Chi Minh City</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Opening Hours</div>
+                        <div class="footer-hours">
+                            <div class="footer-item">
+                                <span>Monday - Friday:</span>
+                                <a>8:00 AM - 9:00 PM</a>
+                            </div>
+                            <div class="footer-item">
+                                <span>Saturday - Sunday:</span>
+                                <a>7:00 AM - 10:00 PM</a>
+                            </div>
+                        </div>
+                    </div>
+    
+                    
+                    <div class="footer-section">
+                        <div class="footer-title">Follow Us</div>
+                        <div class="social-links">
+                            <a href="https://facebook.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://x.com/moonwalkercakeshop" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Moonwalker Cake Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
